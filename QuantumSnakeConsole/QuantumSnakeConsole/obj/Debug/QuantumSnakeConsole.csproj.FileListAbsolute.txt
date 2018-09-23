@@ -1,0 +1,6 @@
+c:\users\martin.ryberglaude\documents\visual studio 2017\Projects\QuantumSnakeConsole\QuantumSnakeConsole\bin\Debug\QuantumSnakeConsole.exe.config
+c:\users\martin.ryberglaude\documents\visual studio 2017\Projects\QuantumSnakeConsole\QuantumSnakeConsole\bin\Debug\QuantumSnakeConsole.exe
+c:\users\martin.ryberglaude\documents\visual studio 2017\Projects\QuantumSnakeConsole\QuantumSnakeConsole\bin\Debug\QuantumSnakeConsole.pdb
+c:\users\martin.ryberglaude\documents\visual studio 2017\Projects\QuantumSnakeConsole\QuantumSnakeConsole\obj\Debug\QuantumSnakeConsole.csprojResolveAssemblyReference.cache
+c:\users\martin.ryberglaude\documents\visual studio 2017\Projects\QuantumSnakeConsole\QuantumSnakeConsole\obj\Debug\QuantumSnakeConsole.exe
+c:\users\martin.ryberglaude\documents\visual studio 2017\Projects\QuantumSnakeConsole\QuantumSnakeConsole\obj\Debug\QuantumSnakeConsole.pdb
