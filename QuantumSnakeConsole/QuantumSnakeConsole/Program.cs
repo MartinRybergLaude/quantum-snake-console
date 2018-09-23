@@ -165,20 +165,16 @@ namespace QuantumSnakeConsole {
         private static void DrawWalls() {
             Console.ForegroundColor = WallColor;
             for (var i = 0; i < Console.WindowWidth - 1; i++) {
-                Console.Write(wallCharacter);
                 Console.SetCursorPosition(i, 0);
-            }
-            for (var i = 0; i < Console.WindowWidth - 0; i++) {
                 Console.Write(wallCharacter);
                 Console.SetCursorPosition(i, Console.WindowHeight - 2);
+                Console.Write(wallCharacter);
             }
             for (var i = 0; i < Console.WindowHeight - 1; i++) {
+                Console.SetCursorPosition(Console.WindowWidth - 1, i);
                 Console.Write(wallCharacter);
                 Console.SetCursorPosition(0, i);
-            }
-            for (var i = 0; i < Console.WindowHeight - 1; i++) {
                 Console.Write(wallCharacter);
-                Console.SetCursorPosition(Console.WindowWidth - 1, i);
             }
         }
         private static void OnDraw() {
