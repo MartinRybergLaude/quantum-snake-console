@@ -6,14 +6,16 @@ using System.Threading;
 namespace QuantumSnakeConsole {
     internal class Program {
 
-        private static string snakeCharacter = "■";
-        private static string appleCharacter = "■";
-        private static string wallCharacter = "█";
+        private const string SnakeCharacter = "██";
+        private const string AppleCharacter = "██";
+        private const string WallCharacter = "██";
+        private const int SnakeIncrease = 3;
+        private const int ApplesCount = 4;
 
-        private static readonly ConsoleColor logoTopColor = ConsoleColor.Cyan;
-        private static readonly ConsoleColor logoBottomColor = ConsoleColor.Magenta;
-        private static readonly ConsoleColor menuItemColor = ConsoleColor.Magenta;
-        private static readonly ConsoleColor errorColor = ConsoleColor.Red;
+        private const ConsoleColor LogoTopColor = ConsoleColor.Cyan;
+        private const ConsoleColor LogoBottomColor = ConsoleColor.Magenta;
+        private const ConsoleColor MenuItemColor = ConsoleColor.Magenta;
+        private const ConsoleColor ErrorColor = ConsoleColor.Red;
 
         private const ConsoleColor WallColor = ConsoleColor.Red;
         private const ConsoleColor SnakeColor = ConsoleColor.Cyan;
@@ -56,21 +58,21 @@ namespace QuantumSnakeConsole {
             Console.Title = "BEEP BOOP";
             Console.CursorVisible = false;
             Menu();
-
         }
+
         private static void Menu() {
             switch (menuState) {
                 case 0:
                     PrintLogo();
                     Console.SetCursorPosition(40, 14);
-                    Console.ForegroundColor = menuItemColor;
+                    Console.ForegroundColor = MenuItemColor;
                     Console.WriteLine("Press 1 to start Classic");
                     Console.SetCursorPosition(40, 16);
                     Console.WriteLine("Press 2 to start VSCPU");
                     break;
                 case 1:
                     Console.SetCursorPosition(40, 18);
-                    Console.ForegroundColor = errorColor;
+                    Console.ForegroundColor = ErrorColor;
                     Console.WriteLine("Not implemented yet!");
                     break;
                 case 2:
@@ -80,18 +82,18 @@ namespace QuantumSnakeConsole {
                     Console.SetCursorPosition(40, 12);
                     Console.WriteLine("Score: " + currentScore);
                     Console.SetCursorPosition(40, 14);
-                    Console.ForegroundColor = menuItemColor;
+                    Console.ForegroundColor = MenuItemColor;
                     Console.WriteLine("Press 1 to start Classic");
                     Console.SetCursorPosition(40, 16);
                     Console.WriteLine("Press 2 to start VSCPU");
                     Console.SetCursorPosition(40, 18);
-                    Console.ForegroundColor = errorColor;
+                    Console.ForegroundColor = ErrorColor;
                     Console.WriteLine("You lost!");
                     break;
                 default:
                     PrintLogo();
                     Console.SetCursorPosition(40, 14);
-                    Console.ForegroundColor = menuItemColor;
+                    Console.ForegroundColor = MenuItemColor;
                     Console.WriteLine("Press 1 to start Classic");
                     Console.SetCursorPosition(40, 16);
                     Console.WriteLine("Press 2 to start VSCPU");
@@ -124,6 +126,7 @@ namespace QuantumSnakeConsole {
             gameSpeed = 50;
             windowWidth = Console.WindowWidth;
             windowHeight = Console.WindowHeight;
+            windowWidth = windowWidth / 2;
             Console.BufferWidth = Console.WindowWidth;
             Console.BufferHeight = Console.WindowHeight;
             foodPosition = null;
@@ -145,12 +148,12 @@ namespace QuantumSnakeConsole {
             }
         }
         private static void PrintLogo() {
-            Console.ForegroundColor = logoTopColor;
+            Console.ForegroundColor = LogoTopColor;
             Console.SetCursorPosition(0, 3);
             for (int i = 0; i < Logo.Length; i++) {
                 for (int j = 0; j < Logo[i].Length; j++) {
                     if (i >= 3 && i < 7 && j > 2 && j < 5) {
-                        Console.ForegroundColor = logoBottomColor;
+                        Console.ForegroundColor = LogoBottomColor;
                     }
                     Console.Write(Logo[i][j]);
                 }
@@ -160,30 +163,22 @@ namespace QuantumSnakeConsole {
         }
         private static void DrawWalls() {
             Console.ForegroundColor = WallColor;
-            for (var i = 0; i < Console.WindowWidth - 1; i++) {
-                Console.SetCursorPosition(i, 0);
-                Console.Write(wallCharacter);
-                Console.SetCursorPosition(i, Console.WindowHeight - 2);
-                Console.Write(wallCharacter);
+            for (var i = 0; i < windowWidth; i++) {
+                DrawPixel(i, 1, WallCharacter, WallColor);
+                DrawPixel(i, windowHeight-2, WallCharacter, WallColor);
             }
-            for (var i = 0; i < Console.WindowHeight - 1; i++) {
-                Console.SetCursorPosition(Console.WindowWidth - 1, i);
-                Console.Write(wallCharacter);
-                Console.SetCursorPosition(0, i);
-                Console.Write(wallCharacter);
+            for (var i = 0; i < windowHeight - 2; i++) {
+                DrawPixel(windowWidth - 1, i, WallCharacter, WallColor);
+                DrawPixel(0, i, WallCharacter, WallColor);
             }
         }
         private static void OnDraw() {
             foreach (var apple in apples) {
                 Console.ForegroundColor = FoodColor;
-                Console.SetCursorPosition(apple.Left, apple.Top);
-                Console.Write(appleCharacter);
+                DrawPixel(apple.Left, apple.Top, AppleCharacter, FoodColor);
             }
-
             if (points.Count == 0) return;
-            Console.ForegroundColor = SnakeColor;
-            Console.SetCursorPosition(points.Last().Left, points.Last().Top);
-            Console.Write(snakeCharacter);
+            DrawPixel(points.Last().Left, points.Last().Top, SnakeCharacter, SnakeColor);
         }
         private class Position {
             public int Left;
@@ -320,22 +315,23 @@ namespace QuantumSnakeConsole {
         }
 
         private static void DrawCurrentDirection() {
-            Console.SetCursorPosition(80, 0);
-            Console.WriteLine("                    ");
-            Console.SetCursorPosition(80, 0);
-            Console.WriteLine(" Direction: " + currentDirection + " ");
+            DrawPixel(40, 0, "                    ");
+            DrawPixel(40, 0, " Direction: " + currentDirection + " ");
         }
 
         private static void DrawCurrentSpeed() {
-            Console.SetCursorPosition(50, 0);
-            Console.WriteLine("                    ");
-            Console.SetCursorPosition(50, 0);
-            Console.WriteLine(" Speed: " + currentSpeed + " ");
+            DrawPixel(25, 0, "                    ");
+            DrawPixel(25, 0, " Speed: " + currentSpeed + " ");
         }
 
         private static void DrawCurrentScore() {
-            Console.SetCursorPosition(20, 0);
-            Console.WriteLine(" Score: " + currentScore + " ");
+            DrawPixel(10, 0, "Score: " + currentScore + " ");
+        }
+
+        private static void DrawPixel(double x, double y, string text, ConsoleColor color = ConsoleColor.White) {
+            Console.ForegroundColor = color;
+            Console.SetCursorPosition(Convert.ToInt32(x * 2), Convert.ToInt32(y));
+            Console.WriteLine(text);
         }
 
         private static void SetLastKey(Direction direction) {
@@ -394,8 +390,8 @@ namespace QuantumSnakeConsole {
         private static bool UpdateGame() {
             if (DateTime.Now < nextUpdate) return false;
             Console.CursorVisible = false;
-            if (apples.Count() < applesCount) {
-                while (apples.Count() < applesCount) {
+            if (apples.Count() < ApplesCount) {
+                while (apples.Count() < ApplesCount) {
                     foodPosition = new Position() {
                         Left = random.Next(4, windowWidth - 4),
                         Top = random.Next(4, windowHeight - 4)
@@ -411,9 +407,9 @@ namespace QuantumSnakeConsole {
         private static void DetectCollision(Position currentPos) {
             // Off screen check     
             if (currentPos.Top < 1) {
-                currentPos.Top = windowHeight - 3;
+                currentPos.Top = windowHeight - 4;
             }
-            if (currentPos.Top > windowHeight - 3) {
+            if (currentPos.Top > windowHeight - 4) {
                 currentPos.Top = 1;
             }
             if (currentPos.Left < 1) {
@@ -450,10 +446,7 @@ namespace QuantumSnakeConsole {
             Menu();
         }
         private static void CleanUp() {
-            Console.SetCursorPosition(points.First().Left, points.First().Top);
-            Console.WriteLine(new string(' ', 1));
-            // Console.WriteLine("\b \b");
-
+            DrawPixel(points.First().Left, points.First().Top, "  ");
             while (points.Count() > snakeLength) {
                 points.Remove(points.First());
             }
