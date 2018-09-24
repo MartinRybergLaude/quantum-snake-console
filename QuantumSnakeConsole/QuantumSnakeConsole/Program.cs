@@ -19,17 +19,13 @@ namespace QuantumSnakeConsole {
         private const ConsoleColor SnakeColor = ConsoleColor.Cyan;
         private const ConsoleColor FoodColor = ConsoleColor.Magenta;
 
-        private static int gameSpeed = 50;
         private static int snakeLength = 5;
-        private static readonly int snakeIncrease = 3;
-        private static readonly int applesCount = 4;
-        private static readonly int speedChange = 10;
-        private static readonly int upperSpeedLimit = 100;
-        private static readonly int lowerSpeedLimit = 10;
         private static int currentScore = 0;
+        private static int gameSpeed = 50;
         private static int menuState = 0;
 
         private static List<Position> points = new List<Position>();
+        private static List<Position> enemyPoints = new List<Position>();
         private static List<Position> apples = new List<Position>();
         private static Position foodPosition;
         private static Random random = new Random();
@@ -440,7 +436,7 @@ namespace QuantumSnakeConsole {
                         apples.Remove(apples[i]);
                     }
                 }
-                snakeLength += snakeIncrease;
+                snakeLength += SnakeIncrease;
                 currentScore++;
                 DrawCurrentScore();
             }

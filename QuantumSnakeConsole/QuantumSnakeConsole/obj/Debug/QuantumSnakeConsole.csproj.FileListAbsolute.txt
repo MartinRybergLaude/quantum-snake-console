@@ -4,3 +4,10 @@ c:\users\martin.ryberglaude\documents\visual studio 2017\Projects\QuantumSnakeCo
 c:\users\martin.ryberglaude\documents\visual studio 2017\Projects\QuantumSnakeConsole\QuantumSnakeConsole\obj\Debug\QuantumSnakeConsole.csprojResolveAssemblyReference.cache
 c:\users\martin.ryberglaude\documents\visual studio 2017\Projects\QuantumSnakeConsole\QuantumSnakeConsole\obj\Debug\QuantumSnakeConsole.exe
 c:\users\martin.ryberglaude\documents\visual studio 2017\Projects\QuantumSnakeConsole\QuantumSnakeConsole\obj\Debug\QuantumSnakeConsole.pdb
+C:\Users\martin.ryberglaude\Desktop\Github Repos\QuantumSnakeConsole\QuantumSnakeConsole\QuantumSnakeConsole\bin\Debug\QuantumSnakeConsole.exe.config
+C:\Users\martin.ryberglaude\Desktop\Github Repos\QuantumSnakeConsole\QuantumSnakeConsole\QuantumSnakeConsole\bin\Debug\QuantumSnakeConsole.exe
+C:\Users\martin.ryberglaude\Desktop\Github Repos\QuantumSnakeConsole\QuantumSnakeConsole\QuantumSnakeConsole\bin\Debug\QuantumSnakeConsole.pdb
+C:\Users\martin.ryberglaude\Desktop\Github Repos\QuantumSnakeConsole\QuantumSnakeConsole\QuantumSnakeConsole\obj\Debug\QuantumSnakeConsole.csprojAssemblyReference.cache
+C:\Users\martin.ryberglaude\Desktop\Github Repos\QuantumSnakeConsole\QuantumSnakeConsole\QuantumSnakeConsole\obj\Debug\QuantumSnakeConsole.csproj.CoreCompileInputs.cache
+C:\Users\martin.ryberglaude\Desktop\Github Repos\QuantumSnakeConsole\QuantumSnakeConsole\QuantumSnakeConsole\obj\Debug\QuantumSnakeConsole.exe
+C:\Users\martin.ryberglaude\Desktop\Github Repos\QuantumSnakeConsole\QuantumSnakeConsole\QuantumSnakeConsole\obj\Debug\QuantumSnakeConsole.pdb
