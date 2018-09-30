@@ -86,14 +86,20 @@ namespace QuantumSnakeConsole {
         private class FComparator : IComparer<Position> {
 
             int IComparer<Position>.Compare(Position x, Position y) {
+                if (x.Left == y.Left && x.Top == y.Top) {
+                    return 0;
+                }
                 if (x.GetF() < y.GetF()) {
                     return -1;
-                } else if (x.GetF() == y.GetF()) {
-                    return 0;
-                } else {
+                }
+                if (x.GetF() == y.GetF()) {
+                    return -1;
+                }
+                if (x.GetF() > y.GetF()){
                     return 1;
                 }
-            
+
+                return 0;
             }
         }
 
@@ -127,6 +133,8 @@ namespace QuantumSnakeConsole {
         private static Random random = new Random();
         private static DateTime nextUpdate = DateTime.MinValue;
         private static bool alive;
+        private static bool debug = false;
+        private static bool enemyAlive;
         private static ConsoleKeyInfo lastKey;
         private static bool hasStarted = false;
 
@@ -139,6 +147,7 @@ namespace QuantumSnakeConsole {
         }
 
         private static Speed currentSpeed;
+        private static int numberOfSpeeds = Enum.GetValues(typeof(Speed)).Length;
 
         private enum Direction {
             North,
@@ -237,6 +246,7 @@ namespace QuantumSnakeConsole {
                     menuState = 0;
                     Console.Clear();
                     currentGameMode = GameMode.Vscpu;
+                    enemyAlive = false;
                     GameStart();
                     break;
                 default:
@@ -320,7 +330,7 @@ namespace QuantumSnakeConsole {
 
             if (snakePoints.Count == 0) return;
             DrawPixel(snakePoints.Last().Left, snakePoints.Last().Top, SnakeCharacter, SnakeColor);
-            if (currentGameMode == GameMode.Vscpu) {
+            if (currentGameMode == GameMode.Vscpu && enemyAlive) {
                 DrawPixel(enemyPoints.Last().Left, enemyPoints.Last().Top, SnakeCharacter, EnemyColor);
             }
         }
@@ -403,58 +413,32 @@ namespace QuantumSnakeConsole {
                         break;
                     case ConsoleKey.OemPlus:
                     case ConsoleKey.Add:
-                        switch (currentSpeed) {
-                            case Speed.VerySlow:
-                                currentSpeed = Speed.Slow;
-                                gameSpeed = 100;
-                                break;
-                            case Speed.Slow:
-                                currentSpeed = Speed.Normal;
-                                gameSpeed = 50;
-                                break;
-                            case Speed.Normal:
-                                currentSpeed = Speed.Fast;
-                                gameSpeed = 25;
-                                break;
-                            case Speed.Fast:
-                                currentSpeed = Speed.VeryFast;
-                                gameSpeed = 10;
-                                break;
-                            default:
-                                currentSpeed = currentSpeed;
-                                break;
-                        }
-
+                        if (currentSpeed != Speed.VeryFast)
+                            currentSpeed += 1;
+                        SetSpeed();
                         DrawCurrentSpeed();
                         SetDirection(currentPos);
                         SetLastKey(currentDirection);
                         break;
                     case ConsoleKey.OemMinus:
                     case ConsoleKey.Subtract:
-                        switch (currentSpeed) {
-                            case Speed.Slow:
-                                currentSpeed = Speed.VerySlow;
-                                gameSpeed = 200;
-                                break;
-                            case Speed.Normal:
-                                currentSpeed = Speed.Slow;
-                                gameSpeed = 100;
-                                break;
-                            case Speed.Fast:
-                                currentSpeed = Speed.Normal;
-                                gameSpeed = 50;
-                                break;
-                            case Speed.VeryFast:
-                                currentSpeed = Speed.Fast;
-                                gameSpeed = 25;
-                                break;
-                            default:
-                                currentSpeed = currentSpeed;
-                                gameSpeed = gameSpeed;
-                                break;
-                        }
-
+                        if (currentSpeed != Speed.VerySlow)
+                            currentSpeed -= 1;
+                        SetSpeed();
                         DrawCurrentSpeed();
+                        SetDirection(currentPos);
+                        SetLastKey(currentDirection);
+                        break;
+                    case ConsoleKey.Escape:
+                        GameOver();
+                        break;
+                    case ConsoleKey.P:
+                        Console.ReadKey(true);
+                        SetDirection(currentPos);
+                        SetLastKey(currentDirection);
+                        break;
+                    case ConsoleKey.O:
+                        debug = !debug;
                         SetDirection(currentPos);
                         SetLastKey(currentDirection);
                         break;
@@ -464,11 +448,29 @@ namespace QuantumSnakeConsole {
                         break;
                 }
             }
-
             DetectCollision(currentPos);
             snakePoints.Add(currentPos);
         }
-
+        private static void SetSpeed() {
+            switch (currentSpeed)
+            {
+                case Speed.VerySlow:
+                    gameSpeed = 200;
+                    break;
+                case Speed.Slow:
+                    gameSpeed = 100;
+                    break;
+                case Speed.Normal:
+                    gameSpeed = 50;
+                    break;
+                case Speed.Fast:
+                    gameSpeed = 25;
+                    break;
+                case Speed.VeryFast:
+                    gameSpeed = 10;
+                    break;
+            }
+        }
         private static void DrawCurrentDirection() {
             DrawPixel(40, 0, "                    ");
             DrawPixel(40, 0, " Direction: " + currentDirection + " ", ScoreColor);
@@ -555,7 +557,8 @@ namespace QuantumSnakeConsole {
                         Left = random.Next(4, arenaWidth),
                         Top = random.Next(4, arenaHeight)
                     };
-                    while (snakePoints.Any(p => p.Left == foodPosition.Left && p.Top == foodPosition.Top)) {
+                    while (snakePoints.Any(p => p.Left == foodPosition.Left && p.Top == foodPosition.Top) 
+                           || enemyPoints.Any(p => p.Left == foodPosition.Left && p.Top == foodPosition.Top)) {
                         foodPosition = new Position() {
                             Left = random.Next(4, arenaWidth),
                             Top = random.Next(4, arenaHeight)
@@ -565,11 +568,10 @@ namespace QuantumSnakeConsole {
                     apples.Add(foodPosition);
                 }
             }
-            
-            if (currentGameMode == GameMode.Vscpu) {
+            OnChooseDirection(lastKey);
+            if (currentGameMode == GameMode.Vscpu && enemyAlive) {
                 EnemyAlgorithm();
             }
-            OnChooseDirection(lastKey);
             CleanUp();
             nextUpdate = DateTime.Now.AddMilliseconds(gameSpeed);
             return true;
@@ -600,19 +602,12 @@ namespace QuantumSnakeConsole {
             }
 
             // Apple collision check
-            if (apples.Any(a => a.Left == currentPos.Left && a.Top == currentPos.Top)) {
-                for (int i = 0; i < apples.Count(); i++) {
-                    if (apples[i].Left == currentPos.Left && apples[i].Top == currentPos.Top) {
-                        apples.Remove(apples[i]);
-                    }
-                }
-                snakeLength += SnakeIncrease;
-                currentScore++;
-                DrawCurrentScore();
-            }
-            if (currentGameMode == GameMode.Vscpu && apples.Any(a => a.Left == enemyPoints.Last().Left && a.Top == enemyPoints.Last().Top)) {
-                for (int i = 0; i < apples.Count(); i++) {
-                    if (apples[i].Left == enemyPoints.Last().Left && apples[i].Top == enemyPoints.Last().Top) {
+            if (currentGameMode == GameMode.Vscpu && enemyAlive && apples.Any(a => a.Left == enemyPoints.Last().Left && a.Top == enemyPoints.Last().Top))
+            {
+                for (int i = 0; i < apples.Count(); i++)
+                {
+                    if (apples[i].Left == enemyPoints.Last().Left && apples[i].Top == enemyPoints.Last().Top)
+                    {
                         apples.Remove(apples[i]);
                         randomApple = random.Next(0, 3);
                     }
@@ -620,7 +615,23 @@ namespace QuantumSnakeConsole {
 
                 enemyLength += SnakeIncrease;
             }
-            
+
+            if (apples.Any(a => a.Left == currentPos.Left && a.Top == currentPos.Top)) {
+                for (int i = 0; i < apples.Count(); i++) {
+                    if (apples[i].Left == currentPos.Left && apples[i].Top == currentPos.Top) {
+                        apples.Remove(apples[i]);
+                    }
+                }
+
+                if (!enemyAlive) {
+                    enemyAlive = true;
+                }
+
+                snakeLength += SnakeIncrease;
+                currentScore++;
+                DrawCurrentScore();
+            }
+
             // Enemy collision check
             if (enemyPoints.Any(p => p.Left == currentPos.Left && p.Top == currentPos.Top)) {
                 GameOver();
@@ -645,7 +656,7 @@ namespace QuantumSnakeConsole {
                 snakePoints.Remove(snakePoints.First());
             }
 
-            if (currentGameMode == GameMode.Vscpu) {
+            if (currentGameMode == GameMode.Vscpu && enemyAlive) {
                 DrawPixel(enemyPoints.First().Left, enemyPoints.First().Top, "  ");
                 while (enemyPoints.Count() > enemyLength) {
                     enemyPoints.Remove(enemyPoints.First());
@@ -654,8 +665,12 @@ namespace QuantumSnakeConsole {
         }
 
         private static void CleanUpEnemy() {
+            foreach (var point in enemyPoints) {
+                DrawPixel(point.Left, point.Top, "  ");
+            }
             enemyPoints.Clear();
             enemyLength = 5;
+            enemyAlive = false;
         }
 
         private static Position GetStartPosition() {
@@ -676,7 +691,6 @@ namespace QuantumSnakeConsole {
         private static HashSet<Position> closedList;
         private static List<Position> Path;
         private static void EnemyAlgorithm() {
-            //System.Diagnostics.Debug.WriteLine("Init reached");
             Position currentPos;
             Position goalPos;
             goalPos = apples[randomApple];
@@ -695,16 +709,6 @@ namespace QuantumSnakeConsole {
         }
 
         private static void ChooseEnemyDirection(List<Position> path, Position currentPos, Position goalPos) {
-            //System.Diagnostics.Debug.WriteLine("Choose direction reached");
-            if (path == null) {
-                path = FinishedPath(currentPos, goalPos);
-                Position goTo = path[0];
-                int X = goTo.GetX();
-                int Y = goTo.GetY();
-                ListDirectionSelector(X, Y, goTo);
-                path.RemoveAt(0);
-            }
-
             if (!path.Any()) {
                 List<Position> randomPositions = GetAdjacent(currentPos, true);
                 if (randomPositions.Any()) {
@@ -713,9 +717,9 @@ namespace QuantumSnakeConsole {
                     int X = tempPosition.GetX();
                     int Y = tempPosition.GetY();
                     ListDirectionSelector(X, Y, tempPosition);
-                    path.RemoveAt(0);
                 }
                 else {
+                    //System.Diagnostics.Debug.WriteLine("no adjacents");
                     CleanUpEnemy();
                 }
             }
@@ -724,6 +728,7 @@ namespace QuantumSnakeConsole {
                 int X = goTo.GetX();
                 int Y = goTo.GetY();
                 ListDirectionSelector(X, Y, currentPos);
+                path.RemoveAt(0);
             }
         }
 
@@ -751,14 +756,33 @@ namespace QuantumSnakeConsole {
             openList.Add(start);
             bool done = false;
             while (openList.Any()) {
-                currentNode = openList.Count != 0 ? LowestFInOpen() : start;
-                closedList.Add(currentNode);
-                openList.Remove(currentNode);
-               
-                if (closedList.Any(e => e.Left == goal.Left && e.Top == goal.Top)) {
-                    return GetPath(start, currentNode);
+                if (debug){
+                    foreach (var node in closedList){
+                        DrawPixel(node.Left, node.Top, SnakeCharacter, ConsoleColor.DarkGreen);
+                    }
+                    foreach (var node in openList){
+                        DrawPixel(node.Left, node.Top, SnakeCharacter, ConsoleColor.DarkBlue);
+                    }
                 }
 
+                if (openList.Count != 0)
+                    currentNode = LowestFInOpen();
+                else
+                    currentNode = start;
+                closedList.Add(currentNode);
+                openList.Remove(currentNode);
+                if (closedList.Contains(goal)) {
+                    if (debug) {
+                        foreach (var node in closedList){
+                            DrawPixel(node.Left, node.Top, "  ", ConsoleColor.DarkGreen);
+                        }
+                        foreach (var node in openList)
+                        {
+                            DrawPixel(node.Left, node.Top, "  ", ConsoleColor.DarkGreen);
+                        }
+                    }
+                    return GetPath(start, currentNode);
+                }
                 List<Position> adjacentNodes = GetAdjacent(currentNode, false);
                 foreach (var currentAdj in adjacentNodes) {
                     if (!openList.Contains(currentAdj)) {
@@ -766,18 +790,18 @@ namespace QuantumSnakeConsole {
                         currentAdj.SetH(goal);
                         currentAdj.SetG(currentAdj);
                         openList.Add(currentAdj);
-                    } else {
-                        if (currentAdj.GetG() > currentAdj.CalculateG(currentNode)) {
-                            currentAdj.SetPrevious(currentNode);
-                            currentAdj.SetG(currentNode);
-                        }
+                    } else if (currentAdj.GetG() > currentAdj.CalculateG(currentNode)){
+                        currentAdj.SetPrevious(currentNode);
+                        currentAdj.SetG(currentNode);
                     }
                 }
                 if (!openList.Any()) {
-                    CleanUpEnemy();
+                    List<Position> pathNull = new List<Position>();
+                    return pathNull;
                 }
             }
-            return null;
+            List<Position> path = new List<Position>();
+            return path;
         }
         private static Position LowestFInOpen() {
             Position cheapest = openList.First();
@@ -854,8 +878,8 @@ namespace QuantumSnakeConsole {
                 || x.Left < 1
                 || x.Top < 1
                 || x.Top > arenaHeight
-                || (enemyPoints.Any(e => e.Left == x.Left && e.Top == x.Top))
-                || (snakePoints.Any(e => e.Left == x.Left && e.Top == x.Top))) {
+                || (enemyPoints.Contains(x))
+                || (snakePoints.Contains(x))) {
                // System.Diagnostics.Debug.WriteLine("isnt walkable");
                 return false;
             }
