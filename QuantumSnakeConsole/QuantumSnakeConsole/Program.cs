@@ -106,7 +106,7 @@ namespace QuantumSnakeConsole {
     private const string SnakeCharacter = "██";
         private const string AppleCharacter = "██";
         private const string WallCharacter = "██";
-        private const int SnakeIncrease = 3;
+        private const int SnakeIncrease = 1;
         private const int ApplesCount = 4;
 
         private const ConsoleColor LogoTopColor = ConsoleColor.Cyan;
@@ -116,6 +116,8 @@ namespace QuantumSnakeConsole {
         private const ConsoleColor ErrorColor = ConsoleColor.Red;
 
         private const ConsoleColor WallColor = ConsoleColor.Red;
+        private const ConsoleColor OpenListColor = ConsoleColor.Blue;
+        private const ConsoleColor ClosedListColor = ConsoleColor.Green;
         private const ConsoleColor SnakeColor = ConsoleColor.Cyan;
         private const ConsoleColor EnemyColor = ConsoleColor.White;
         private const ConsoleColor FoodColor = ConsoleColor.Magenta;
@@ -758,10 +760,13 @@ namespace QuantumSnakeConsole {
             while (openList.Any()) {
                 if (debug){
                     foreach (var node in closedList){
-                        DrawPixel(node.Left, node.Top, SnakeCharacter, ConsoleColor.DarkGreen);
+                        DrawPixel(node.Left, node.Top, SnakeCharacter, ClosedListColor);
                     }
                     foreach (var node in openList){
-                        DrawPixel(node.Left, node.Top, SnakeCharacter, ConsoleColor.DarkBlue);
+                        DrawPixel(node.Left, node.Top, SnakeCharacter, OpenListColor);
+                    }
+                    foreach (var node in enemyPoints) {
+                        DrawPixel(node.Left, node.Top, SnakeCharacter, EnemyColor);
                     }
                 }
 
@@ -774,11 +779,10 @@ namespace QuantumSnakeConsole {
                 if (closedList.Contains(goal)) {
                     if (debug) {
                         foreach (var node in closedList){
-                            DrawPixel(node.Left, node.Top, "  ", ConsoleColor.DarkGreen);
+                            DrawPixel(node.Left, node.Top, "  ", ClosedListColor);
                         }
-                        foreach (var node in openList)
-                        {
-                            DrawPixel(node.Left, node.Top, "  ", ConsoleColor.DarkGreen);
+                        foreach (var node in openList) {
+                            DrawPixel(node.Left, node.Top, "  ", OpenListColor);
                         }
                     }
                     return GetPath(start, currentNode);
