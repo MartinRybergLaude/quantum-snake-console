@@ -149,7 +149,6 @@ namespace QuantumSnakeConsole {
         }
 
         private static Speed currentSpeed;
-        private static int numberOfSpeeds = Enum.GetValues(typeof(Speed)).Length;
 
         private enum Direction {
             North,
@@ -167,12 +166,6 @@ namespace QuantumSnakeConsole {
         };
 
         private static GameMode currentGameMode;
-
-        private enum NodeState {
-            Untested,
-            Open,
-            Closed
-        }
 
         private static int windowWidth = Console.WindowWidth;
         private static int windowHeight = Console.WindowHeight;
@@ -288,7 +281,7 @@ namespace QuantumSnakeConsole {
                     if ((AcceptInput() && UpdateGame()) || (UpdateGame())) {
                         OnDraw();
                     }
-
+                    //To prevent excessive CPU usage.
                     Thread.Sleep(1);
                 }
         }
@@ -359,10 +352,7 @@ namespace QuantumSnakeConsole {
                 currentPos = GetStartPosition();
             }
 
-            if (!hasStarted) {
-                currentPos.Left++;
-            }
-            else {
+            if (hasStarted) {
                 // Choose Direction depending on key
                 switch (key.Key) {
                     case ConsoleKey.S:
@@ -450,6 +440,10 @@ namespace QuantumSnakeConsole {
                         break;
                 }
             }
+            else {
+                currentPos.Left++;
+            }
+
             DetectCollision(currentPos);
             snakePoints.Add(currentPos);
         }
