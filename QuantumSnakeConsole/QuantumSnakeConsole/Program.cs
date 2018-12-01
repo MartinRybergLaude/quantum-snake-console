@@ -682,7 +682,7 @@ namespace QuantumSnakeConsole {
             };
         }
 
-        private static int randomApple = 1;
+        private static int randomApple = 0;
         private static SortedSet<Position> openList;
         private static HashSet<Position> closedList;
         private static List<Position> Path;
