@@ -1,4 +1,4 @@
-# QuantumSnakeConsole
+# Quantum Snake
 A console app snake game with an enemy snake sporting an A* algorithm.
 
 ## Platform
